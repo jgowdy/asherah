@@ -80,6 +80,27 @@ namespace GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl
             Dispose(disposing: false);
         }
 
+        public override TResult WithSecretIntPtr<TResult>(Func<IntPtr, ulong, TResult> funcWithSecret)
+        {
+            if (pointer == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("Attempt to access disposed secret");
+            }
+
+            TResult result;
+            SetReadAccessIfNeeded();
+            try
+            {
+                result = funcWithSecret(pointer, length);
+            }
+            finally
+            {
+                SetNoAccessIfNeeded();
+            }
+
+            return result;
+        }
+
         public override TResult WithSecretBytes<TResult>(Func<byte[], TResult> funcWithSecret)
         {
             if (pointer == IntPtr.Zero)

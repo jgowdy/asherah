@@ -8,6 +8,8 @@ namespace GoDaddy.Asherah.SecureMemory
 
         public abstract TResult WithSecretUtf8Chars<TResult>(Func<char[], TResult> funcWithSecret);
 
+        public abstract TResult WithSecretIntPtr<TResult>(Func<IntPtr, ulong, TResult> funcWithSecret);
+
         public virtual void WithSecretBytes(Action<byte[]> actionWithSecret)
         {
             WithSecretBytes(bytes =>
