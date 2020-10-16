@@ -10,6 +10,10 @@ namespace GoDaddy.Asherah.Crypto.Keys
 
         public abstract TResult WithKey<TResult>(Func<byte[], TResult> actionWithKey);
 
+        public abstract void WithKey(Action<IntPtr, ulong> actionWithKey);
+
+        public abstract TResult WithKey<TResult>(Func<IntPtr, ulong, TResult> actionWithKey);
+
         public abstract void Dispose();
 
         public abstract bool IsRevoked();

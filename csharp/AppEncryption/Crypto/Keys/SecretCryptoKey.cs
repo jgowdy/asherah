@@ -43,6 +43,16 @@ namespace GoDaddy.Asherah.Crypto.Keys
             return Secret.WithSecretBytes(actionWithKey);
         }
 
+        public override void WithKey(Action<IntPtr, ulong> actionWithKey)
+        {
+            Secret.WithSecretIntPtr(actionWithKey);
+        }
+
+        public override TResult WithKey<TResult>(Func<IntPtr, ulong, TResult> actionWithKey)
+        {
+            return Secret.WithSecretIntPtr(actionWithKey);
+        }
+
         public override void Dispose()
         {
             Secret.Dispose();

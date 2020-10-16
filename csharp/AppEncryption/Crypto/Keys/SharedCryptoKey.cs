@@ -30,6 +30,16 @@ namespace GoDaddy.Asherah.Crypto.Keys
             return SharedKey.WithKey(actionWithKey);
         }
 
+        public override void WithKey(Action<IntPtr, ulong> actionWithKey)
+        {
+            SharedKey.WithKey(actionWithKey);
+        }
+
+        public override TResult WithKey<TResult>(Func<IntPtr, ulong, TResult> actionWithKey)
+        {
+            return SharedKey.WithKey(actionWithKey);
+        }
+
         public override void Dispose()
         {
             // SharedCryptoKey doesn't *own* any secrets so it doesn't have anything to dispose

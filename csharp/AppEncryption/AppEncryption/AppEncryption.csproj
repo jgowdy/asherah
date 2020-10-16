@@ -26,6 +26,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.105.15" />
     <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.105.18" />
+    <PackageReference Include="GoDaddy.Asherah.PlatformNative" Version="0.1.9" />
     <PackageReference Include="GoDaddy.Asherah.SecureMemory" Version="0.1.9" />
     <PackageReference Include="LanguageExt.Core" Version="3.4.13" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
