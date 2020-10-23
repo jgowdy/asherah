@@ -1,90 +1,83 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using GoDaddy.Asherah.PlatformNative.LP64.Libc;
-
-[assembly: InternalsVisibleTo("SecureMemory.Tests")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+using GoDaddy.Asherah.PlatformNative;
 
 namespace GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Libc
 {
-    internal abstract class LibcProtectedMemoryAllocatorLP64 : IProtectedMemoryAllocator
+    internal class LibcProtectedMemoryAllocatorLP64 : IProtectedMemoryAllocator
     {
-        private static long resourceLimit;
+        private static ulong resourceLimit;
         private static long memoryLocked;
-        private readonly LibcLP64 libc;
-        private bool globallyDisabledCoreDumps = false;
 
-        protected LibcProtectedMemoryAllocatorLP64(LibcLP64 libc)
+        public LibcProtectedMemoryAllocatorLP64(SystemInterface systemInterface)
         {
-            this.libc = libc ?? throw new ArgumentNullException(nameof(libc));
-
-            libc.getrlimit(GetMemLockLimit(), out var rlim);
-            if (rlim.rlim_max == rlimit.UNLIMITED)
-            {
-                resourceLimit = 0;
-            }
-            else
-            {
-                resourceLimit = (long)rlim.rlim_max;
-            }
+            SystemInterface = systemInterface ?? throw new ArgumentNullException(nameof(systemInterface));
+            resourceLimit = systemInterface.GetMemoryLockLimit();
         }
 
-        // Implementation order of preference:
-        // memset_s (standards)
-        // explicit_bzero (BSD)
-        // SecureZeroMemory (Windows)
-        // bzero (Linux, same guarantees as explicit_bzero)
+        protected SystemInterface SystemInterface { get; }
+
         public virtual void SetNoAccess(IntPtr pointer, ulong length)
         {
-            Check.Zero(libc.mprotect(pointer, length, GetProtNoAccess()), "mprotect(PROT_NONE)");
+            SystemInterface.SetNoAccess(pointer, length);
         }
 
         public virtual void SetReadAccess(IntPtr pointer, ulong length)
         {
-            Check.Zero(libc.mprotect(pointer, length, GetProtRead()), "mprotect(PROT_READ)");
+            SystemInterface.SetReadAccess(pointer, length);
         }
 
         public virtual void SetReadWriteAccess(IntPtr pointer, ulong length)
         {
-            Check.Zero(libc.mprotect(pointer, length, GetProtReadWrite()), "mprotect(PROT_READ|PROT_WRITE)");
+            SystemInterface.SetReadWriteAccess(pointer, length);
         }
 
-        // ************************************
-        // alloc / free
-        // ************************************
         public virtual IntPtr Alloc(ulong length)
         {
-            if (Interlocked.Read(ref memoryLocked) + (long)length > resourceLimit)
+            if ((ulong)Interlocked.Read(ref memoryLocked) + length > resourceLimit)
             {
                 throw new MemoryLimitException(
                     $"Requested MemLock length exceeds resource limit max of {resourceLimit}");
             }
 
-            // Some platforms may require fd to be -1 even if using anonymous
-            IntPtr protectedMemory = libc.mmap(
-                IntPtr.Zero, length, GetProtReadWrite(), GetPrivateAnonymousFlags(), -1, 0);
+            IntPtr protectedMemory = SystemInterface.PageAlloc(length);
 
-            Check.IntPtr(protectedMemory, "mmap");
+            Check.IntPtr(protectedMemory, "PageAlloc");
             try
             {
-                Check.Zero(libc.mlock(protectedMemory, length), "mlock");
+                SystemInterface.LockMemory(protectedMemory, length);
 
                 try
                 {
                     Interlocked.Add(ref memoryLocked, (long)length);
-                    SetNoDump(protectedMemory, length);
+                    SystemInterface.SetNoDump(protectedMemory, length);
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    Check.Zero(libc.munlock(protectedMemory, length), "munlock", e);
-                    Interlocked.Add(ref memoryLocked, 0 - (long)length);
+                    try
+                    {
+                        SystemInterface.UnlockMemory(protectedMemory, length);
+                        Interlocked.Add(ref memoryLocked, 0 - (long)length);
+                    }
+                    catch (Exception unlockException)
+                    {
+                        throw new AggregateException(exception, unlockException);
+                    }
+
                     throw;
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Check.Zero(libc.munmap(protectedMemory, length), "munmap", e);
+                try
+                {
+                    SystemInterface.PageFree(protectedMemory, length);
+                }
+                catch (Exception pageFreeException)
+                {
+                    throw new AggregateException(exception, pageFreeException);
+                }
+
                 throw;
             }
 
@@ -95,8 +88,11 @@ namespace GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Libc
         {
             try
             {
-                // Wipe the protected memory (assumes memory was made writeable)
-                ZeroMemory(pointer, length);
+                // Make memory writable if needed
+                SetReadWriteAccess(pointer, length);
+
+                // Wipe the protected memory
+                SystemInterface.ZeroMemory(pointer, length);
             }
             finally
             {
@@ -105,7 +101,7 @@ namespace GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Libc
                     // Regardless of whether or not we successfully wipe, unlock
 
                     // Unlock the protected memory
-                    Check.Zero(libc.munlock(pointer, length), "munlock");
+                    SystemInterface.UnlockMemory(pointer, length);
                     Interlocked.Add(ref memoryLocked, 0 - (long)length);
                 }
                 finally
@@ -113,50 +109,22 @@ namespace GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Libc
                     // Regardless of whether or not we successfully unlock, unmap
 
                     // Free (unmap) the protected memory
-                    Check.Zero(libc.munmap(pointer, length), "munmap");
+                    SystemInterface.PageFree(pointer, length);
                 }
             }
         }
 
-        public abstract void Dispose();
-
-        internal abstract int GetRlimitCoreResource();
-
-        // ************************************
-        // Core dumps
-        // ************************************
-        internal abstract void SetNoDump(IntPtr pointer, ulong length);
-
-        internal bool AreCoreDumpsGloballyDisabled()
+        public void Dispose()
         {
-            return globallyDisabledCoreDumps;
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        internal void DisableCoreDumpGlobally()
+        protected virtual void Dispose(bool disposing)
         {
-            Check.Zero(libc.setrlimit(GetRlimitCoreResource(), rlimit.Zero()), "setrlimit(RLIMIT_CORE)");
-
-            globallyDisabledCoreDumps = true;
-        }
-
-        // ************************************
-        // Memory protection
-        // ************************************
-        internal abstract int GetProtRead();
-
-        internal abstract int GetProtReadWrite();
-
-        internal abstract int GetProtNoAccess();
-
-        internal abstract int GetPrivateAnonymousFlags();
-
-        internal abstract int GetMemLockLimit();
-
-        protected abstract void ZeroMemory(IntPtr pointer, ulong length);
-
-        protected LibcLP64 GetLibc()
-        {
-            return libc;
+            if (disposing)
+            {
+            }
         }
     }
 }

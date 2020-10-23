@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using GoDaddy.Asherah.PlatformNative;
+using GoDaddy.Asherah.PlatformNative.LLP64.Windows;
 using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Windows;
 using Microsoft.Extensions.Configuration;
 using Xunit;
@@ -25,9 +27,14 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl.Windows
                 { "maximumWorkingSetSize", "67108860"},
             }).Build();
 
+            var systemInterface = SystemInterface.ConfigureSystemInterface(configuration);
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                windowsProtectedMemoryAllocator = new WindowsProtectedMemoryAllocatorVirtualAlloc(configuration);
+                windowsProtectedMemoryAllocator = new WindowsProtectedMemoryAllocatorLLP64(
+                    configuration,
+                    systemInterface,
+                    new WindowsMemoryEncryption());
             }
         }
 

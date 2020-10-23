@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using GoDaddy.Asherah.PlatformNative;
+using GoDaddy.Asherah.PlatformNative.LLP64.Windows;
+using GoDaddy.Asherah.PlatformNative.LP64.Libc;
 using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl;
 using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Libc;
-using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Linux;
-using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.MacOS;
 using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl.Windows;
 using Microsoft.Extensions.Configuration;
 using Xunit;
@@ -18,7 +19,8 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
         private static readonly IntPtr InvalidPointer = new IntPtr(-1);
 
         private readonly IProtectedMemoryAllocator protectedMemoryAllocator;
-        private IConfiguration configuration;
+        private readonly IConfiguration configuration;
+        private readonly SystemInterface systemInterface;
 
         public ProtectedMemoryAllocatorTest()
         {
@@ -32,8 +34,10 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
                 {"minimumAllocationSize", "128"},
             }).Build();
 
+            systemInterface = SystemInterface.ConfigureSystemInterface(configuration);
+
             Debug.WriteLine("ProtectedMemoryAllocatorTest ctor");
-            protectedMemoryAllocator = GetPlatformAllocator(configuration);
+            protectedMemoryAllocator = GetPlatformAllocator();
         }
 
         public void Dispose()
@@ -42,19 +46,22 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
             protectedMemoryAllocator.Dispose();
         }
 
-        internal IProtectedMemoryAllocator GetPlatformAllocator(IConfiguration configuration)
+        internal IProtectedMemoryAllocator GetPlatformAllocator()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                return new LinuxProtectedMemoryAllocatorLP64();
+                return new LibcProtectedMemoryAllocatorLP64(systemInterface);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return new MacOSProtectedMemoryAllocatorLP64();
+                return new LibcProtectedMemoryAllocatorLP64(systemInterface);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return new WindowsProtectedMemoryAllocatorVirtualAlloc(configuration);
+                return new WindowsProtectedMemoryAllocatorLLP64(
+                    configuration,
+                    systemInterface,
+                    new WindowsMemoryEncryption());
             }
             else
             {
@@ -73,8 +80,8 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
         [Fact]
         private void TestTwoAllocatorInstances()
         {
-            var allocator1 = GetPlatformAllocator(configuration);
-            var allocator2 = GetPlatformAllocator(configuration);
+            var allocator1 = GetPlatformAllocator();
+            var allocator2 = GetPlatformAllocator();
             Assert.NotNull(allocator1);
             Assert.NotNull(allocator2);
             allocator1.Dispose();
