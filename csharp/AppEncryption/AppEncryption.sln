@@ -1,12 +1,20 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppEncryption", "AppEncryption\AppEncryption.csproj", "{92DFF862-81AA-47CC-B543-6D1142E57565}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppEncryption", "AppEncryption\AppEncryption.csproj", "{92DFF862-81AA-47CC-B543-6D1142E57565}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppEncryption.Tests", "AppEncryption.Tests\AppEncryption.Tests.csproj", "{D2814AE8-DA0A-482A-9C71-7E336BE591FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppEncryption.Tests", "AppEncryption.Tests\AppEncryption.Tests.csproj", "{D2814AE8-DA0A-482A-9C71-7E336BE591FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto", "Crypto\Crypto.csproj", "{1EE43D5F-B2C2-4BE9-8BCA-F95254F89BDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crypto", "Crypto\Crypto.csproj", "{1EE43D5F-B2C2-4BE9-8BCA-F95254F89BDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppEncryption.IntegrationTests", "AppEncryption.IntegrationTests\AppEncryption.IntegrationTests.csproj", "{80D1C842-6298-4D15-AB9F-BC89110DBA43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppEncryption.IntegrationTests", "AppEncryption.IntegrationTests\AppEncryption.IntegrationTests.csproj", "{80D1C842-6298-4D15-AB9F-BC89110DBA43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureMemory", "..\SecureMemory\SecureMemory\SecureMemory.csproj", "{6079A309-C33E-4E6C-BF64-D10C8083EADA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformNative", "..\SecureMemory\PlatformNative\PlatformNative.csproj", "{18898F86-A896-4E8B-891A-1A9E88589016}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureMemory.Tests", "..\SecureMemory\SecureMemory.Tests\SecureMemory.Tests.csproj", "{B0D19EBF-25B0-4E69-BA20-A6F062DCBAF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +38,23 @@ Global
 		{80D1C842-6298-4D15-AB9F-BC89110DBA43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80D1C842-6298-4D15-AB9F-BC89110DBA43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80D1C842-6298-4D15-AB9F-BC89110DBA43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6079A309-C33E-4E6C-BF64-D10C8083EADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6079A309-C33E-4E6C-BF64-D10C8083EADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6079A309-C33E-4E6C-BF64-D10C8083EADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6079A309-C33E-4E6C-BF64-D10C8083EADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18898F86-A896-4E8B-891A-1A9E88589016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18898F86-A896-4E8B-891A-1A9E88589016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18898F86-A896-4E8B-891A-1A9E88589016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18898F86-A896-4E8B-891A-1A9E88589016}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0D19EBF-25B0-4E69-BA20-A6F062DCBAF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0D19EBF-25B0-4E69-BA20-A6F062DCBAF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0D19EBF-25B0-4E69-BA20-A6F062DCBAF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0D19EBF-25B0-4E69-BA20-A6F062DCBAF0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8094C542-45D2-4E7C-9A5F-DDE5C5D0C68D}
 	EndGlobalSection
 EndGlobal

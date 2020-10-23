@@ -41,5 +41,6 @@
   </ItemGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="../Crypto/Crypto.csproj" />
+    <ProjectReference Include="..\..\SecureMemory\SecureMemory\SecureMemory.csproj" />
   </ItemGroup>
 </Project>

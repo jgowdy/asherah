@@ -28,6 +28,7 @@
     <ItemGroup Label="Project References">
         <ProjectReference Include="../AppEncryption/AppEncryption.csproj" />
         <ProjectReference Include="../AppEncryption.Tests/AppEncryption.Tests.csproj" />
+        <ProjectReference Include="..\..\SecureMemory\SecureMemory\SecureMemory.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Include="config.yaml" CopyToOutputDirectory="Always" />

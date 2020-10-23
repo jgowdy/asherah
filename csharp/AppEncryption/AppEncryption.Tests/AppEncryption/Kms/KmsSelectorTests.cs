@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using GoDaddy.Asherah.AppEncryption.Kms;
 using GoDaddy.Asherah.Crypto;
 using Microsoft.Extensions.Configuration;

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using GoDaddy.Asherah.Crypto.BufferUtils;
 using GoDaddy.Asherah.Crypto.Keys;
 using GoDaddy.Asherah.SecureMemory;
+using GoDaddy.Asherah.SecureMemory.ProtectedMemoryImpl;
 using Microsoft.Extensions.Configuration;
 
 [assembly: InternalsVisibleTo("AppEncryption.Tests")]
@@ -22,7 +23,7 @@ namespace GoDaddy.Asherah.Crypto
 
         protected AeadCrypto(IConfiguration configuration)
         {
-            secretFactory = new TransientSecretFactory(configuration);
+            secretFactory = new ProtectedMemorySecretFactory(configuration);
             nonceGenerator = new NonceGenerator();
         }
 

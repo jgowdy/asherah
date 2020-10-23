@@ -4,7 +4,7 @@ using GoDaddy.Asherah.Crypto.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
-namespace GoDaddy.Asherah.AppEncryption.Tests
+namespace GoDaddy.Asherah.AppEncryption.Tests.AppEncryption.Kms
 {
     internal class TestKmsBadConfigurations : TheoryData<IConfiguration, Type>
     {

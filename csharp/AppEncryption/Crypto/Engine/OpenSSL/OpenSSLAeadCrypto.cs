@@ -1,18 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 using GoDaddy.Asherah.Crypto.Envelope;
 using GoDaddy.Asherah.Crypto.Keys;
-using GoDaddy.Asherah.PlatformNative.LP64.Linux;
+using GoDaddy.Asherah.PlatformNative.OpenSSL;
 using Microsoft.Extensions.Configuration;
 
 namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
 {
     public class OpenSSLAeadCrypto : AeadEnvelopeCrypto, IDisposable
     {
-        private readonly OpenSSLCrypto crypto;
-        private readonly LinuxOpenSSL11LP64 allocator;
+        private readonly IOpenSSLCrypto crypto;
         private readonly ulong blockSize;
         private readonly ulong ivSize;
         private readonly IntPtr cipher;
@@ -21,8 +18,14 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
         public OpenSSLAeadCrypto(IConfiguration configuration)
             : base(configuration)
         {
-            crypto = new OpenSSLCrypto();
-            allocator = new LinuxOpenSSL11LP64();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                crypto = new OpenSSLCryptoWindows(configuration);
+            }
+            else
+            {
+                crypto = new OpenSSLCryptoLibc(configuration);
+            }
 
             cipher = crypto.EVP_get_cipherbyname("aes-256-gcm");
             blockSize = (ulong)crypto.EVP_CIPHER_block_size(cipher);
@@ -51,7 +54,7 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
                 var handle = GCHandle.Alloc(input, GCHandleType.Pinned);
                 try
                 {
-                    var outPtr = allocator.CRYPTO_secure_malloc(len + blockSize);
+                    var outPtr = crypto.CRYPTO_secure_malloc(len + blockSize);
                     try
                     {
                         crypto.EVP_EncryptUpdate(
@@ -69,7 +72,7 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
                     }
                     finally
                     {
-                        allocator.CRYPTO_secure_clear_free(outPtr, len + blockSize);
+                        crypto.CRYPTO_secure_clear_free(outPtr, len + blockSize);
                     }
                 }
                 finally
@@ -89,7 +92,7 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
                 var handle = GCHandle.Alloc(input, GCHandleType.Pinned);
                 try
                 {
-                    var outPtr = allocator.CRYPTO_secure_malloc(len + blockSize);
+                    var outPtr = crypto.CRYPTO_secure_malloc(len + blockSize);
                     try
                     {
                         crypto.EVP_DecryptUpdate(
@@ -107,7 +110,7 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
                     }
                     finally
                     {
-                        allocator.CRYPTO_secure_clear_free(outPtr, len + blockSize);
+                        crypto.CRYPTO_secure_clear_free(outPtr, len + blockSize);
                     }
                 }
                 finally
