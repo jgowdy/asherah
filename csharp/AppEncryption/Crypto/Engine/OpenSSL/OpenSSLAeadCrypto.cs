@@ -92,6 +92,11 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
             {
                 // TODO: Deal with the iv
                 var iv = IntPtr.Zero;
+
+                var nonceSizeBytes = (ulong)(GetNonceSizeBits() / 8);
+                IntPtr noncePtr = crypto.CRYPTO_secure_malloc(nonceSizeBytes);
+                crypto.RAND_bytes(noncePtr, (int)nonceSizeBytes);
+
                 var result = crypto.EVP_DecryptInit_ex(ctx, cipher, IntPtr.Zero, ptr, iv);
                 crypto.CheckResult(result, 1, "EVP_DecryptInit_ex");
 
