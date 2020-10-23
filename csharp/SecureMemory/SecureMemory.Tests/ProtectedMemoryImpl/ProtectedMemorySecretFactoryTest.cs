@@ -13,11 +13,26 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
     {
         private readonly IConfiguration configuration;
 
-        public ProtectedMemorySecretFactoryTest()
+        private void SetupConsoleTraceListener()
         {
+            if (Trace.Listeners.Count > 0)
+            {
+                foreach (var listener in Trace.Listeners)
+                {
+                    if (listener is ConsoleTraceListener)
+                    {
+                        return;
+                    }
+                }
+            }
             Trace.Listeners.Clear();
             var consoleListener = new ConsoleTraceListener();
             Trace.Listeners.Add(consoleListener);
+        }
+
+        public ProtectedMemorySecretFactoryTest()
+        {
+            SetupConsoleTraceListener();
 
             var configDictionary = new Dictionary<string, string>();
             configDictionary["debugSecrets"] = "true";
@@ -64,7 +79,7 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
         [Fact]
         private void TestInvalidSecureHeapEngine()
         {
-            var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()
+            var localConfig = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()
             {
                 {"secureHeapEngine", "donkey-ssl"}
             }).Build();
@@ -73,10 +88,11 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
 
             Assert.Throws<PlatformNotSupportedException>(() =>
             {
-                using var factory = new ProtectedMemorySecretFactory(configuration);
+                using var factory = new ProtectedMemorySecretFactory(localConfig);
             });
         }
 
+        [Fact]
         private void TestMmapSecureHeapEngine()
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()
@@ -91,11 +107,6 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
         [Fact]
         private void TestTwoFactories()
         {
-            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()
-            {
-                {"secureHeapEngine", "mmap"}
-            }).Build();
-
             Debug.WriteLine("ProtectedMemorySecretFactoryTest.TestTwoFactories");
             using var factory1 = new ProtectedMemorySecretFactory(configuration);
             using var factory2 = new ProtectedMemorySecretFactory(configuration);

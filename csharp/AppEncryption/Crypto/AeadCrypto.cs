@@ -137,7 +137,7 @@ namespace GoDaddy.Asherah.Crypto
             Array.Copy(nonce, 0, cipherText, cipherText.Length - nonce.Length, nonce.Length);
         }
 
-        protected byte[] GenerateNonce()
+        protected virtual byte[] GenerateNonce()
         {
             return nonceGenerator.CreateNonce(GetNonceSizeBits());
         }

@@ -17,11 +17,27 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl.OpenSSL
         private readonly IConfiguration configuration;
         private readonly SystemInterface systemInterface;
         private readonly IOpenSSLCrypto crypto;
-        public OpenSSL11ProtectedMemoryAllocatorTest()
+
+        private void SetupConsoleTraceListener()
         {
+            if (Trace.Listeners.Count > 0)
+            {
+                foreach (var listener in Trace.Listeners)
+                {
+                    if (listener is ConsoleTraceListener)
+                    {
+                        return;
+                    }
+                }
+            }
             Trace.Listeners.Clear();
             var consoleListener = new ConsoleTraceListener();
             Trace.Listeners.Add(consoleListener);
+        }
+
+        public OpenSSL11ProtectedMemoryAllocatorTest()
+        {
+            SetupConsoleTraceListener();
 
             configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()
             {

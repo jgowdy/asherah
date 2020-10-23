@@ -1,3 +1,4 @@
+#if !DEBUG
 namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
 {
     public enum VirtualUnlockErrors
@@ -5,3 +6,4 @@ namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
         ERROR_NOT_LOCKED = 158,
     }
 }
+#endif

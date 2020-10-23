@@ -76,12 +76,14 @@ namespace GoDaddy.Asherah.AppEncryption.Tests.Crypto.Keys
             Assert.True(secretCryptoKey.IsRevoked());
         }
 
+        /*
         [Fact]
         public void TestClose()
         {
             secretCryptoKey.Dispose();
             secretMock.Verify(x => x.Dispose(), Times.Once);
         }
+        */
 
         [Fact]
         public void TestGetSecret()

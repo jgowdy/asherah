@@ -369,9 +369,9 @@ namespace GoDaddy.Asherah.Crypto
                 return this;
             }
 
-            public IBuildStep WithConfiguration(IConfiguration configuration)
+            public IBuildStep WithConfiguration(IConfiguration config)
             {
-                this.configuration = configuration;
+                configuration = config;
                 return this;
             }
 

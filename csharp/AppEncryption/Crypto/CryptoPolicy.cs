@@ -1,5 +1,6 @@
 using System;
 using GoDaddy.Asherah.Crypto.Engine.BouncyCastle;
+using GoDaddy.Asherah.Crypto.Engine.OpenSSL;
 using GoDaddy.Asherah.Crypto.Envelope;
 using GoDaddy.Asherah.Crypto.Exceptions;
 using GoDaddy.Asherah.Crypto.ExtensionMethods;
@@ -27,7 +28,22 @@ namespace GoDaddy.Asherah.Crypto
                                 break;
                             case null:
                             case "":
-                                generateCrypto = defaultGenerateCrypto;
+                                generateCrypto = () => new BouncyAes256GcmCrypto(configuration);
+                                break;
+                            default:
+                                throw new CipherNotSupportedException("Unknown cipher: " + configuration["cipher"]);
+                        }
+
+                        break;
+                    case "OpenSSL":
+                        switch (configuration["cipher"])
+                        {
+                            case "aes-256-gcm":
+                                generateCrypto = () => new OpenSSLAeadCrypto(configuration);
+                                break;
+                            case null:
+                            case "":
+                                generateCrypto = () => new OpenSSLAeadCrypto(configuration);
                                 break;
                             default:
                                 throw new CipherNotSupportedException("Unknown cipher: " + configuration["cipher"]);

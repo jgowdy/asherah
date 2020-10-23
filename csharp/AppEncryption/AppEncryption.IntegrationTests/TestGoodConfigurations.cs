@@ -12,6 +12,7 @@ namespace GoDaddy.Asherah.AppEncryption.IntegrationTests
             yield return new object[] { TestDefaultCryptoPolicyConfig() };
             yield return new object[] { TestBlankCipherConfig() };
             yield return new object[] { TestSomeOptionalsConfig() };
+            yield return new object[] { TestOpenSSLCryptoConfig() };
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -86,6 +87,27 @@ namespace GoDaddy.Asherah.AppEncryption.IntegrationTests
                     { "kmsStaticKey", "staticKey" },
                     { "kmsAwsPreferredRegion", string.Empty },
                     { "cryptoEngine", "Bouncy" },
+                    { "cipher", string.Empty },
+                    { "keyRotationStrategy", "inline" },
+                    { "canCacheSystemKeys", "true" },
+                    { "canCacheIntermediateKeys", "true" },
+                    { "sessionCacheExpireMillis", "30000" },
+                }).Build();
+        }
+
+        private IConfiguration TestOpenSSLCryptoConfig()
+        {
+            return new ConfigurationBuilder().AddInMemoryCollection(
+                new Dictionary<string, string>
+                {
+                    { "keyExpirationDays", "90" },
+                    { "revokeCheckMinutes", "30" },
+                    { "metastoreType", "memory" },
+                    { "metastoreAdoConnectionString", string.Empty },
+                    { "kmsType", "static" },
+                    { "kmsStaticKey", "staticKey" },
+                    { "kmsAwsPreferredRegion", string.Empty },
+                    { "cryptoEngine", "OpenSSL" },
                     { "cipher", string.Empty },
                     { "keyRotationStrategy", "inline" },
                     { "canCacheSystemKeys", "true" },

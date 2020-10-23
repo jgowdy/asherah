@@ -51,7 +51,7 @@ namespace GoDaddy.Asherah.AppEncryption.Tests.Crypto.Keys
         [Fact]
         private void TestGetWithRevokeCheckExpiredShouldReturnNull()
         {
-            using (SecureCryptoKeyDictionary<string> secureCryptoKeyDictionary = new SecureCryptoKeyDictionary<string>(1))
+            using (var secureCryptoKeyDictionary = new SecureCryptoKeyDictionary<string>(1))
             {
                 string key = "some_key";
                 secureCryptoKeyDictionary.PutAndGetUsable(key, sharedCryptoKeyMock.Object);

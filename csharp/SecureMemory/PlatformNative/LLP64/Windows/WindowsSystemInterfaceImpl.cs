@@ -106,15 +106,18 @@ namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
 
         public override void LockMemory(IntPtr pointer, ulong length)
         {
+#if !DEBUG
             if (!WindowsInterop.VirtualLock(pointer, (UIntPtr)length))
             {
                 var errno = Marshal.GetLastWin32Error();
                 throw new WindowsOperationFailedException("VirtualLock", 0L, errno);
             }
+#endif
         }
 
         public override void UnlockMemory(IntPtr pointer, ulong length)
         {
+#if !DEBUG
             if (!WindowsInterop.VirtualUnlock(pointer, (UIntPtr)length))
             {
                 var errno = Marshal.GetLastWin32Error();
@@ -125,6 +128,7 @@ namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
 
                 throw new WindowsOperationFailedException("VirtualUnlock", 0L, errno);
             }
+#endif
         }
 
         public override ulong GetMemoryLockLimit()

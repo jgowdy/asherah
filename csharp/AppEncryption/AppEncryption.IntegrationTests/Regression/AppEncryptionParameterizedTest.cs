@@ -24,10 +24,7 @@ namespace GoDaddy.Asherah.AppEncryption.IntegrationTests.Regression
 
         public AppEncryptionParameterizedTest()
         {
-            Trace.Listeners.Clear();
-            var consoleListener = new ConsoleTraceListener();
-            Trace.Listeners.Add(consoleListener);
-
+            SetupConsoleTraceListener();
             payload = PayloadGenerator.CreateDefaultRandomJsonPayload();
         }
 
@@ -170,6 +167,24 @@ namespace GoDaddy.Asherah.AppEncryption.IntegrationTests.Regression
                     x => x.LoadLatest(It.IsAny<string>()),
                     Times.Never);
             }
+        }
+
+        private void SetupConsoleTraceListener()
+        {
+            if (Trace.Listeners.Count > 0)
+            {
+                foreach (var listener in Trace.Listeners)
+                {
+                    if (listener is ConsoleTraceListener)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            Trace.Listeners.Clear();
+            var consoleListener = new ConsoleTraceListener();
+            Trace.Listeners.Add(consoleListener);
         }
 
         private class AppEncryptionParameterizedTestData : IEnumerable<object[]>, IDisposable

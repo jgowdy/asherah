@@ -10,11 +10,26 @@ namespace GoDaddy.Asherah.SecureMemory.Tests
     {
         private readonly Mock<Secret> secretMock;
 
-        public SecretTest()
+        private void SetupConsoleTraceListener()
         {
+            if (Trace.Listeners.Count > 0)
+            {
+                foreach (var listener in Trace.Listeners)
+                {
+                    if (listener is ConsoleTraceListener)
+                    {
+                        return;
+                    }
+                }
+            }
             Trace.Listeners.Clear();
             var consoleListener = new ConsoleTraceListener();
             Trace.Listeners.Add(consoleListener);
+        }
+
+        public SecretTest()
+        {
+            SetupConsoleTraceListener();
 
             Debug.WriteLine("\nSecretTest ctor");
             secretMock = new Mock<Secret>();

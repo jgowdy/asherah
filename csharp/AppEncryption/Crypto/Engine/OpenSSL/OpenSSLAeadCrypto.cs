@@ -51,21 +51,25 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
                 // TODO: Deal with the iv
                 var iv = IntPtr.Zero;
                 var result = crypto.EVP_EncryptInit_ex(ctx, cipher, IntPtr.Zero, ptr, iv);
+                crypto.CheckResult(result, 1, "EVP_EncryptInit_ex");
+
                 var handle = GCHandle.Alloc(input, GCHandleType.Pinned);
                 try
                 {
                     var outPtr = crypto.CRYPTO_secure_malloc(len + blockSize);
                     try
                     {
-                        crypto.EVP_EncryptUpdate(
+                        result = crypto.EVP_EncryptUpdate(
                             ctx,
                             outPtr,
                             out int outLength,
                             handle.AddrOfPinnedObject(),
                             input.Length);
 
+                        crypto.CheckResult(result, 1, "EVP_EncryptUpdate");
                         var finalPtr = IntPtr.Add(outPtr, outLength);
-                        crypto.EVP_EncryptFinal_ex(ctx, finalPtr, out outLength);
+                        result = crypto.EVP_EncryptFinal_ex(ctx, finalPtr, out outLength);
+                        crypto.CheckResult(result, 1, "EVP_EncryptFinal_ex");
                         var outputBytes = new byte[outLength];
                         Marshal.Copy(outPtr, outputBytes, 0, outLength);
                         return outputBytes;
@@ -89,21 +93,26 @@ namespace GoDaddy.Asherah.Crypto.Engine.OpenSSL
                 // TODO: Deal with the iv
                 var iv = IntPtr.Zero;
                 var result = crypto.EVP_DecryptInit_ex(ctx, cipher, IntPtr.Zero, ptr, iv);
+                crypto.CheckResult(result, 1, "EVP_DecryptInit_ex");
+
                 var handle = GCHandle.Alloc(input, GCHandleType.Pinned);
                 try
                 {
                     var outPtr = crypto.CRYPTO_secure_malloc(len + blockSize);
                     try
                     {
-                        crypto.EVP_DecryptUpdate(
+                        result = crypto.EVP_DecryptUpdate(
                             ctx,
                             outPtr,
                             out int outLength,
                             handle.AddrOfPinnedObject(),
                             input.Length);
 
+                        crypto.CheckResult(result, 1, "EVP_DecryptUpdate");
                         var finalPtr = IntPtr.Add(outPtr, outLength);
-                        crypto.EVP_DecryptFinal_ex(ctx, finalPtr, out outLength);
+                        result = crypto.EVP_DecryptFinal_ex(ctx, finalPtr, out outLength);
+                        crypto.CheckResult(result, 1, "EVP_DecryptFinal_ex");
+
                         var outputBytes = new byte[outLength];
                         Marshal.Copy(outPtr, outputBytes, 0, outLength);
                         return outputBytes;
