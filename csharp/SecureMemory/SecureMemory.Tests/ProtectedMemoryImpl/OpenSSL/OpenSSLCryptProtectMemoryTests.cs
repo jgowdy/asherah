@@ -47,7 +47,7 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl.OpenSSL
                 openSSL11ProtectedMemoryAllocatorLP64 = new OpenSSL11ProtectedMemoryAllocatorLP64(
                     configuration,
                     systemInterface,
-                    new OpenSSLCryptProtectMemory("aes-256-gcm", systemInterface, crypto),
+                    openSSLCryptProtectMemory,
                     crypto);
             }
             catch (OpenSSLSecureHeapUnavailableException)

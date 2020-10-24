@@ -138,7 +138,8 @@ namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
             var result = WindowsInterop.GetProcessWorkingSetSize(hProcess, ref min, ref max);
             if (!result)
             {
-                throw new Exception("GetProcessWorkingSetSize failed");
+                var err = Marshal.GetLastWin32Error();
+                throw new Exception("GetProcessWorkingSetSize failed: " + err);
             }
 
             return (ulong)max;
@@ -151,7 +152,8 @@ namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
             var result = WindowsInterop.GetProcessWorkingSetSize(hProcess, ref min, ref max);
             if (!result)
             {
-                throw new Exception("GetProcessWorkingSetSize failed");
+                var err = Marshal.GetLastWin32Error();
+                throw new Exception("GetProcessWorkingSetSize failed: " + err);
             }
 
             if (limit < (ulong)max)
@@ -165,7 +167,8 @@ namespace GoDaddy.Asherah.PlatformNative.LLP64.Windows
             result = WindowsInterop.SetProcessWorkingSetSize(hProcess, min, max);
             if (!result)
             {
-                throw new Exception($"SetProcessWorkingSetSize({min.ToUInt64()},{max.ToUInt64()}) failed");
+                var err = Marshal.GetLastWin32Error();
+                throw new Exception($"SetProcessWorkingSetSize({min.ToUInt64()},{max.ToUInt64()}) failed: " + err);
             }
         }
     }

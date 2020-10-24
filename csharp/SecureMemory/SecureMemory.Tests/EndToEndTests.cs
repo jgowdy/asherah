@@ -10,27 +10,9 @@ namespace GoDaddy.Asherah.SecureMemory.Tests
     [Collection("Logger Fixture collection")]
     public class EndToEndTests
     {
-        private void SetupConsoleTraceListener()
+        private EndToEndTests()
         {
-            if (Trace.Listeners.Count > 0)
-            {
-                foreach (var listener in Trace.Listeners)
-                {
-                    if (listener is ConsoleTraceListener)
-                    {
-                        return;
-                    }
-                }
-            }
-            Trace.Listeners.Clear();
-            var consoleListener = new ConsoleTraceListener();
-            Trace.Listeners.Add(consoleListener);
-        }
-
-        [Fact]
-        private void EndToEndTest()
-        {
-            SetupConsoleTraceListener();
+            TraceListenerConfig.ConfigureTraceListener();
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection()
@@ -58,7 +40,7 @@ namespace GoDaddy.Asherah.SecureMemory.Tests
         [Fact]
         private void EndToEndOpenSSLTest()
         {
-            SetupConsoleTraceListener();
+            TraceListenerConfig.ConfigureTraceListener();
 
             var dictionary = new Dictionary<string,string>
             {

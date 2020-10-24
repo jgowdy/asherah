@@ -24,26 +24,9 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl.Libc
         private readonly SystemInterface systemInterface;
         private readonly LibcProtectedMemoryAllocatorLP64 libcProtectedMemoryAllocator;
 
-        private void SetupConsoleTraceListener()
+        private LibcProtectedMemoryAllocatorTest()
         {
-            if (Trace.Listeners.Count > 0)
-            {
-                foreach (var listener in Trace.Listeners)
-                {
-                    if (listener is ConsoleTraceListener)
-                    {
-                        return;
-                    }
-                }
-            }
-            Trace.Listeners.Clear();
-            var consoleListener = new ConsoleTraceListener();
-            Trace.Listeners.Add(consoleListener);
-        }
-
-        public LibcProtectedMemoryAllocatorTest()
-        {
-            SetupConsoleTraceListener();
+            TraceListenerConfig.ConfigureTraceListener();
 
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()
             {

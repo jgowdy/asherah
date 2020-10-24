@@ -13,26 +13,9 @@ namespace GoDaddy.Asherah.SecureMemory.Tests.ProtectedMemoryImpl
     {
         private readonly IConfiguration configuration;
 
-        private void SetupConsoleTraceListener()
+        private ProtectedMemorySecretFactoryTest()
         {
-            if (Trace.Listeners.Count > 0)
-            {
-                foreach (var listener in Trace.Listeners)
-                {
-                    if (listener is ConsoleTraceListener)
-                    {
-                        return;
-                    }
-                }
-            }
-            Trace.Listeners.Clear();
-            var consoleListener = new ConsoleTraceListener();
-            Trace.Listeners.Add(consoleListener);
-        }
-
-        public ProtectedMemorySecretFactoryTest()
-        {
-            SetupConsoleTraceListener();
+            TraceListenerConfig.ConfigureTraceListener();
 
             var configDictionary = new Dictionary<string, string>();
             configDictionary["debugSecrets"] = "true";
